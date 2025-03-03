@@ -1,0 +1,105 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0">Користувачі</h3>
+      </div>
+      <div class="card-body">
+        <div class="row pb-2">
+          <div class="col-4">
+            <input
+              [(ngModel)]="login"
+              placeholder="Логін"
+              type="text"
+              class="form-control"
+            />
+          </div>
+
+          <div class="col-4">
+            <input
+              [(ngModel)]="password"
+              placeholder="Пароль"
+              type="password"
+              class="form-control"
+            />
+          </div>
+
+          <div class="col-4">
+            <select
+            
+              style="height: 58px"
+              [(ngModel)]="role"
+              class="form-control"
+            >
+              <option value="-1">Виберіть Роль</option>
+              <option value="1">Адмін</option>
+              <option value="2">Пілот</option>
+              <option value="3">ППО</option>
+              <option value="4">РЕБ</option>
+              <option value="5">Бригада Адмін</option>
+              <option value="6">Бригада ППО</option>
+              <option value="7">Бригада РЕБ</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-start pb-2">
+              <button (click)="addNewUser()" class="btn btn-primary btn-sm">
+                Створити
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Логін</th>
+                  <th scope="col">Позивний</th>
+                  <th scope="col">Роль</th>
+                  <th scope="col">Видалити</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of users; index as i">
+                  <th scope="row">{{ i + 1 }}</th>
+                  <td>{{ item.login }}</td>
+                  <td>{{ item.userOptions?.nickName }}</td>
+                  <td>
+                    {{
+                      item.role == UserRoles.ADMIN
+                        ? "Адмін"
+                        : item.role == UserRoles.PILOT
+                        ? "Пілот"
+                        : item.role == UserRoles.PPO
+                        ? "ППО"
+                        : item.role == UserRoles.BRIGADE_ADMIN
+                        ? "Бригада Адмін"
+                        : item.role == UserRoles.BRIGADE_PPO
+                        ? "Бригада ППО"
+                        : item.role == UserRoles.BRIGADE_REB
+                        ? "Бригада РЕБ"
+                        : "РЕБ"
+                    }}
+                  </td>
+                  <td>
+                    <button
+                      (click)="removeUser(item._id)"
+                      class="btn btn-danger btn-xs"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

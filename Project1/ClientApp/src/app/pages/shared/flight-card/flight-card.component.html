@@ -1,0 +1,161 @@
+<div *ngIf="flight && options" style="min-width: 240px; max-width: 330px">
+  <div class="card m-1" [class.not-approved]="
+      (userRole == UserRoles.PPO &&
+        this.flight.flightStep.isApprovedByPPO === false) ||
+      (userRole == UserRoles.REB &&
+        this.flight.flightStep.isApprovedByREB === false) ||
+      (userRole == UserRoles.ADMIN &&
+        this.flight.flightStep.isApproved === false)
+    " [style.backgroundColor]="flight.flightStep.step !== FlightSteps.START ? flight.assignment!.color: 'black'
+    ">
+    <div class="card-body p-1" style="border: 2px solid black">
+      <div class="header-step mb-1">
+        <span [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color" class="badge badge-primary" style="color: white;">
+          {{
+            this.flightStatuses[flight.flightStep.visibleStep ?? 0].name.toUpperCase()
+          }}
+        </span>
+      </div>
+      <div class="px-1 bg-white" style="border-radius: 0.25rem;">
+        <div>
+          <div class="d-flex justify-content-between" style="color: black">
+            <div>
+              <b>Модель:</b>
+            </div>
+            <div>
+              <b style="color: blue;">{{ flight.model?.name?.toUpperCase() }}</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between" style="color: black">
+          <div>
+            <b>Смуга:</b>
+          </div>
+          <div>
+            <b style="color: blue;">{{ flight.zone?.toUpperCase() }}</b>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between" style="color: black">
+          <div>
+            <b>Позивний:</b>
+          </div>
+          <div>
+            <b style="color: blue;">{{ flight.operator?.toUpperCase() }}</b>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between" style="color: black">
+          <div>
+            <b>Підрозділ:</b>
+          </div>
+          <div>
+            <b style="color: blue;">{{ flight.unit?.toUpperCase() }}</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info mb-1 mt-1">
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.START">
+          <span class="section-name">Місія:</span>
+          <span class="section-value">{{ flight.dateOfFlight | date: 'ddMMyy-HHmm' }}-{{flight.operator}}</span>
+        </div>
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.FLIGHT">
+          <span [className]="" class="section-name">Виліт:</span>
+          <span class="section-value">{{ flight.flightStartDate | date : "dd/MM/yy HH:mm" }}</span>
+        </div>
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.LBZ_FORWARD">
+          <span class="section-name">ЛБЗ Вперед:</span>
+          <span class="section-value">{{ flight.LBZForwardDate | date : "dd/MM/yy HH:mm" }}</span>
+        </div>
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.RETURN">
+          <span class="section-name">Повернення:</span>
+          <span class="section-value">{{ flight.returnDate | date : "dd/MM/yy HH:mm" }}</span>
+
+        </div>
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.LBZ_HOME">
+          <span class="section-name">ЛБЗ Назад:</span>
+          <span class="section-value">{{ flight.LBZBackDate | date : "dd/MM/yy HH:mm" }}</span>
+        </div>
+        <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.REDUCTION">
+          <span class="section-name">Початок зниження:</span>
+          <span class="section-value"> {{ flight.reductionDate | date : "dd/MM/yy HH:mm" }}</span>
+        </div>
+        <div>
+          <span class="section-name">Завершення:</span>
+          <span class="section-value"> {{ flight.endDate | date : "dd/MM/yy HH:mm" }}</span>
+        </div>
+      </div>
+      <div class="alert alert-info mb-0" style="background-color: white !important">
+        <div>
+          <span class="section-name">Призначення:</span>
+          <span class="section-value"> {{ flight.assignment!.name }}</span>
+        </div>
+
+        <div>
+          <span class="section-name">Маршрут вперед:</span>
+          <span class="section-value">{{ flight.routeForward }}</span>
+        </div>
+
+        <div class="changed-route" *ngIf="flight.isForwardChanged">
+          <span class="section-name">Маршрут до ЛБЗ:</span>
+          <span class="section-value">{{ flight.changedForwardRoute }}</span>
+        </div>
+
+        <div>
+          <span class="section-name">Маршрут назад:</span>
+          <span class="section-value">{{ flight.routeBack }}</span>
+        </div>
+
+        <div class="changed-route" *ngIf="flight.isReturnChanged">
+          <span class="section-name">Маршрут від ЛБЗ:</span>
+          <span class="section-value">{{ flight.changedReturnRoute }}</span>
+        </div>
+        <div *ngIf="!flight.hasOwnProperty('reductionDistance')">
+          <span class="section-name">Початок зниження:</span>
+        </div>
+        <div *ngIf="flight.hasOwnProperty('reductionDistance')">
+          <span class="section-name">Початок зниження:</span>
+          <span class="section-value">за {{ flight.reductionDistance }} км в район {{ flight.reductionLocation }}</span>
+        </div>
+        <div>
+          <span class="section-name">РВЗ:</span>
+          <span class="section-value">{{ flight.taskPerformanceArea }}</span>
+        </div>
+        <div>
+          <span class="section-name">Висота польоту:</span>
+          <span class="section-value">{{ flight.workingHeight }}</span>
+        </div>
+        <div>
+          <span class="section-name">Частота Керування:</span>
+          <span class="section-value">{{ flight.controlRange }}</span>
+        </div>
+        <div>
+          <span class="section-name">Частота Відео:</span>
+          <span class="section-value">{{ flight.videoRange }}</span>
+        </div>
+
+        <div>
+          <span class="section-name">Стрім:</span>
+          <span style="color: green;" class="section-value">{{ flight.streamLink }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="flight.flightStep.isApproved == false" class="alert alert-warning mt-2 mb-0"
+        style="background-color: white !important">
+        <div class="waiting-approval-text" style="border-bottom: 2px solid black;"
+          *ngIf="flight.flightStep.isApprovedByPPO == false">
+          <b>Очікується дозвіл ППО</b>
+        </div>
+        <div class="waiting-approval-text" style="border-bottom: 2px solid black;"
+          *ngIf="flight.flightStep.isApprovedByREB == false">
+          <b>Очікується дозвіл РЕБ</b>
+        </div>
+        <div class="waiting-approval-text" *ngIf="flight.flightStep.isApprovedByAdmin == false">
+          <b>Очікується дозвіл БпС</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

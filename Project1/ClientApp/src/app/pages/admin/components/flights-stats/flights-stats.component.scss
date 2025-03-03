@@ -1,0 +1,17 @@
+@media (max-width: 768px) {
+
+    /* … */
+    .card-body {
+        max-height: 72vh !important;
+    }
+}
+
+
+.table-striped {
+    border: 2px solid black !important;
+}
+
+.table-striped td,
+.table-striped th {
+    border: 2px solid black !important;
+}

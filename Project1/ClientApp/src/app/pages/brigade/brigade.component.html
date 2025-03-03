@@ -1,0 +1,220 @@
+<app-sidebar></app-sidebar>
+
+<div class="dashboard-wrapper">
+  <div class="dashboard-ecommerce">
+    <div class="container-fluid dashboard-content">
+      <div class="d-flex" style="flex-wrap: wrap">
+        <div
+          style="min-width: 240px; max-width: 330px"
+          *ngFor="let flight of flights"
+        >
+          <div
+            class="card m-1"
+            [class.not-approved]="!flight.isChecked"
+            [style.--bg-color] ="
+            flight.flightStep.step !== FlightSteps.START
+              ? flight.assignment!.color
+              : 'black'"
+            [style.backgroundColor]="
+              flight.flightStep.step !== FlightSteps.START
+                ? flight.assignment!.color
+                : 'black'"
+          >
+            <div class="card-body p-1">
+              <div *ngIf="!flight.isExpanded" style="text-align: right; float: right;" (click)="toggleSection(flight)">
+                <span class="bg-white px-2 py-1" style="border: 1px solid black;">
+                  <i class="fas fa-angle-down"></i>
+                </span>
+              </div>
+
+              <div *ngIf="flight.isExpanded" style="text-align: right; float: right;" (click)="toggleSection(flight)">
+                <span class="bg-white px-2 py-1" style="border: 1px solid black;">
+                  <i class="fas fa-angle-up"></i>
+                </span>
+              </div>
+
+              <div class="header-step mb-1" >
+                <span [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
+                  [ngbPopover]="flight.timeFromLastStep" triggers="mouseenter:mouseleave" placement="right"
+                  popoverTitle="Час у поточному статусі" class="badge badge-primary" style="color: white;">
+                  {{
+                    this.flightStatuses[
+                      flight.flightStep.visibleStep ?? 0
+                    ].name.toUpperCase()
+                  }}
+                </span>
+                <div>
+                  <span *ngIf="flight.flightStep.step === this.FlightSteps.END" [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
+                    class="badge badge-primary" style="color: white;">
+                    {{ flight.boardingStatus?.toUpperCase() }}
+                  </span>
+                </div>
+              </div>
+              <div class="px-1 bg-white" style="border-radius: 0.25rem;">
+                <div>
+                  <div class="d-flex justify-content-between" style="color: black">                
+                    <div>
+                      <b>Модель:</b>
+                    </div>
+                    <div>
+                      <b style="color: blue;">{{ flight.model?.name?.toUpperCase() }}</b>
+                    </div>
+                  </div>   
+                </div>
+  
+                <div class="d-flex justify-content-between" style="color: black">
+                  <div>
+                    <b>Смуга:</b>
+                  </div>
+                  <div>
+                    <b style="color: blue;">{{ flight.zone?.toUpperCase() }}</b>
+                  </div>
+                </div>
+  
+                <div class="d-flex justify-content-between" style="color: black">
+                  <div>
+                    <b>Позивний:</b>
+                  </div>
+                  <div>
+                    <b style="color: blue;">{{ flight.operator?.toUpperCase() }}</b>
+                  </div>
+                </div>
+  
+                <div class="d-flex justify-content-between" style="color: black">
+                  <div>
+                    <b>Підрозділ:</b>
+                  </div>
+                  <div>
+                    <b style="color: blue;">{{ flight.unit?.toUpperCase() }}</b>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="alert bg-white mb-1 mt-1"
+                [class.hidden]="!flight.isExpanded"
+              >
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.START">
+                    <span class="section-name">Місія:</span>
+                    <span class="section-value">{{ flight.dateOfFlight | date: 'ddMMyy-HHmm' }}-{{flight.operator}}</span>
+                </div>
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.FLIGHT" 
+                      style="display: flex; justify-content: space-between; cursor: pointer;">
+                    <div>
+                      <span [className]="" class="section-name">Виліт:</span>
+                      <span class="section-value">{{ flight.flightStartDate | date : "dd/MM/yy HH:mm" }}</span>
+                    </div>
+                </div>
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.LBZ_FORWARD"
+                     style="display: flex; justify-content: space-between; cursor: pointer;">
+                    <div>
+                      <span class="section-name">ЛБЗ Вперед:</span>
+                      <span class="section-value">{{ flight.LBZForwardDate | date : "dd/MM/yy HH:mm" }}</span>
+                    </div>
+                </div>
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.RETURN" style="display: flex; justify-content: space-between;">
+                    <div>
+                      <span class="section-name">Повернення:</span>
+                      <span class="section-value">{{ flight.returnDate | date : "dd/MM/yy HH:mm" }}</span>
+                    </div>
+                </div>
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.LBZ_HOME" 
+                  style="display: flex; justify-content: space-between; cursor: pointer;">
+                    <div>
+                      <span class="section-name">ЛБЗ Назад:</span>
+                      <span class="section-value">{{ flight.LBZBackDate | date : "dd/MM/yy HH:mm" }}</span>
+                    </div>
+                </div>
+                <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.REDUCTION" 
+                    style="display: flex; justify-content: space-between; cursor: pointer;">
+                    <div>
+                      <span class="section-name">Початок зниження:</span>
+                      <span class="section-value"> {{ flight.reductionDate | date : "dd/MM/yy HH:mm" }}</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="section-name">Завершення:</span>
+                    <span class="section-value">  {{ flight.endDate | date : "dd/MM/yy HH:mm" }}</span>
+                </div>
+              </div>
+              <div
+                class="alert alert-info mb-0"
+                [class.hidden]="!flight.isExpanded"
+                style="background-color: white !important"
+              >
+                <div>
+                    <span class="section-name">Призначення:</span>
+                    <span class="section-value"> {{ flight.assignment!.name }}</span>
+                </div>
+
+                <div>
+                    <span class="section-name">Маршрут вперед:</span>
+                    <span class="section-value">{{ flight.routeForward }}</span>
+                </div>
+
+                <div class="changed-route" *ngIf="flight.isForwardChanged">
+                    <span class="section-name">Маршрут до ЛБЗ:</span>
+                    <span class="section-value">{{ flight.changedForwardRoute }}</span>
+                </div>
+
+                <div>
+                    <span class="section-name">Маршрут назад:</span>
+                    <span class="section-value">{{ flight.routeBack }}</span>
+                </div>
+
+                <div class="changed-route" *ngIf="flight.isReturnChanged">
+                    <span class="section-name">Маршрут від ЛБЗ:</span>
+                    <span class="section-value">{{ flight.changedReturnRoute }}</span>
+                </div>
+                <div *ngIf="!flight.hasOwnProperty('reductionDistance')">
+                    <span class="section-name">Початок зниження:</span>
+                </div>
+                <div *ngIf="flight.hasOwnProperty('reductionDistance')">
+                    <span class="section-name">Початок зниження:</span>
+                    <span class="section-value">за {{ flight.reductionDistance }} км в район {{ flight.reductionLocation }}</span>
+                </div>
+                <div>
+                    <span class="section-name">РВЗ:</span>
+                    <span class="section-value">{{ flight.taskPerformanceArea }}</span>
+                </div>
+                <div>
+                    <span class="section-name">Висота польоту:</span>
+                    <span class="section-value">{{ flight.workingHeight }}</span>
+                </div>
+                <div>
+                    <span class="section-name">Частота Керування:</span>
+                    <span class="section-value">{{ flight.controlRange }}</span>
+                </div>
+                <div>
+                    <span class="section-name">Частота Відео:</span>
+                    <span class="section-value">{{ flight.videoRange }}</span>
+                </div>
+
+                <div>
+                    <span class="section-name">Стрім:</span>
+                    <span style="color: green;" class="section-value">{{ flight.streamLink }}</span>
+                </div>
+              </div>
+
+              <div
+                *ngIf="flight.flightStep.isApproved == false"
+                class="alert alert-warning mt-2 mb-0"
+                style="background-color: white;"
+              >
+                <div class="waiting-approval-text" *ngIf="flight.flightStep.isApprovedByPPO == false" style="border-bottom: 2px solid black;">
+                  <b >Очікується дозвіл ППО</b>
+                </div>
+                <div class="waiting-approval-text" *ngIf="flight.flightStep.isApprovedByREB == false" style="border-bottom: 2px solid black;">
+                  <b >Очікується дозвіл РЕБ</b>
+                </div>
+                <div class="waiting-approval-text" *ngIf="flight.flightStep.isApprovedByAdmin == false" style="border-bottom: 2px solid black;">
+                  <b >Очікується дозвіл БпС</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

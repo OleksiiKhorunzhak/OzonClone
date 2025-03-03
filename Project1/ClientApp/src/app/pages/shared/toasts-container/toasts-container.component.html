@@ -1,0 +1,4 @@
+<ngb-toast style="font-size: 28px; font-weight: bold;" *ngFor="let toast of toastsService.toasts" [class]="toast.classname" [autohide]="true"
+    [delay]="toast.delay || 5000" (hidden)="toastsService.remove(toast)" (click)="toastsService.remove(toast)">
+    {{ toast.message }}
+</ngb-toast>

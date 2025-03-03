@@ -1,0 +1,97 @@
+<!-- <div class="nav-left-sidebar sidebar-dark">
+    <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 100%;">
+        <div class="menu-list" style="overflow: hidden; width: auto; height: 100%;">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <a class="d-xl-none d-lg-none" href="#">Dashboard</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav flex-column">
+
+                        <li class="nav-divider _nav-sidebar">
+                            Навігація
+                        </li>
+                        
+                        <li *ngIf="userInfo.role == userRoles.ADMIN" a class="nav-item _nav-sidebar">
+                            <a routerLink="/admin" class="nav-link nav-icons" href="#">
+                                <i class="fas fa-fw fa-cog"></i>
+                                Адмін
+                            </a>
+                        </li>
+        
+                        <li *ngIf="userInfo.role == userRoles.PPO" class="nav-item _nav-sidebar">
+                            <a routerLink="/ppo" class="nav-link nav-icons" href="#">
+                                <i class="fas fa-fw fa-rocket"></i>
+                                ППО
+                            </a>
+                        </li>
+        
+                        <li *ngIf="userInfo.role == userRoles.REB" class="nav-item _nav-sidebar">
+                            <a routerLink="/ppo" class="nav-link nav-icons" href="#">
+                                <i class="fas fa-fw fa-rocket"></i>
+                                РЕБ
+                            </a>
+                        </li>
+        
+                        <li *ngIf="userInfo.role == userRoles.ADMIN" class="nav-item _nav-sidebar">
+                            <a routerLink="/ppo" class="nav-link nav-icons" href="#">
+                                <i class="fas fa-fw fa-rocket"></i>
+                                ППО/РЕБ
+                            </a>
+                        </li>
+        
+                        <li *ngIf="userInfo.role == userRoles.ADMIN || userInfo.role == userRoles.PILOT" class="nav-item _nav-sidebar">
+                            <a routerLink="/flight" class="nav-link nav-icons" href="#">
+                                <i class="fas fa-fw fa-user"></i>
+                                Пілот
+                            </a>
+                        </li>
+
+
+                        <li class="nav-divider">
+                                Адмін панель
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" routerLink="/admin/options">
+                                <i class="fas fa-plus"></i>
+                                Редагування опцій
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" routerLink="/admin/users">
+                                <i class="fas fa-plus"></i>
+                                Редагування користувачів
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" routerLink="/admin/flights">
+                                <i class="fas fa-fw fa-rocket"></i>
+                                Статистика польотів
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="slimScrollBar"
+            style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 995.4px;">
+        </div>
+        <div class="slimScrollRail"
+            style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;">
+        </div>
+    </div>
+</div> -->
+
+<app-sidebar [isAdminPage]="true"></app-sidebar>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-ecommerce">
+        <div class="container-fluid dashboard-content ">
+
+            <router-outlet></router-outlet>
+
+        </div>
+    </div>
+</div>

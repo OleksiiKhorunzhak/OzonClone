@@ -1,0 +1,56 @@
+<app-sidebar></app-sidebar>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-ecommerce">
+        <div class="container-fluid dashboard-content ">
+            <div *ngIf="flight">
+
+            <div *ngIf="flight.isRejected === true" class="row">
+                <div class="alert alert-danger w-100 mb-0" role="alert">
+                    <h5 *ngIf="flight.isRejectedbyPPO">Заборонено ППО:</h5>
+                    <h5 *ngIf="flight.isRejectedbyREB">Заборонено РЕБ:</h5>
+                    <h5 *ngIf="flight.isRejectedbyAdmin">Заборонено Черговим:</h5>
+                    <div>
+                        Причина: {{flight.rejectedReason}}
+                    </div>
+                    <div class="mt-2">
+                        <button (click)="terminateFlight(false)" class="_btn-big btn btn-success w-100">Зрозуміло</button>
+                        <button (click)="getLastFlight(false)" class="btn btn-warning w-100 mt-2">Створити згідно останньої заявки </button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!flight.isRejected" class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="justify-content-end d-flex"
+                                *ngIf="(flight.flightStep.step != FlightSteps.START || flight.flightStep.isApproved === true)">
+                                <button *ngIf="!isRequestOpened" class="btn btn-warning" style="width: 100%; height: 10vh; color: black; font-size: 3vh;"
+                                    (click)="navigateToRequest()">
+                                    <b>Заявка</b>
+                                    
+                                </button>
+                                <button *ngIf="isRequestOpened" class="btn btn-warning" style="width: 100%; height: 10vh; color: black; font-size: 3vh;"
+                                    (click)="navigateToRequest()">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                            </div>
+                            <div *ngIf="!isRequestOpened">
+                                <router-outlet></router-outlet>
+                            </div>
+                            <div *ngIf="isRequestOpened">
+                                <div class="d-flex justify-content-center" style="flex-wrap: wrap;">
+                                    <app-flight-card [flight]="flight"></app-flight-card>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+    </div>
+</div>

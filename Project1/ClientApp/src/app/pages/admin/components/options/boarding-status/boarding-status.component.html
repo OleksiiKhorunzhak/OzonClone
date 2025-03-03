@@ -1,0 +1,50 @@
+<div class="tab-regular">
+    <div class="tab-content" id="myTabContent">
+        <!-- Статус повернення -->
+        <div class="tab-pane fade show active" id="boardingStatus" role="tabpanel"
+            aria-labelledby="home-tab">
+
+            <div class="row pb-2">
+                <div class="col-md-6 col-12 mb-2">
+                    <input [(ngModel)]="name" placeholder="Назва" type="text" class="form-control">
+                </div>
+
+                <div class="col-md-4 col-12 mb-2">
+                    <input [(colorPicker)]="color" [style.background]="color" [placeholder]="color === '' ? 'Колір' : color" type="text" class="form-control">
+                </div>
+
+                <div class="col-md-2 col-12 mb-2">
+                    <button (click)="addNewOption('boardingStatus')" class="btn btn-primary btn-sm w-100">Створити</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Назва</th>
+                                <th scope="col">Колір</th>
+                                <th scope="col">Видалити</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of options.boardingStatuses; index as i">
+                                <th scope="row">{{i+1}}</th>
+                                <td>{{item.name}}</td>
+                                <td><span [style.backgroundColor]="item.color" style="color: white;" class="badge">{{colorPlaceholder}}</span></td>
+                                <td>
+                                    <button (click)="removeOption(i,'boardingStatus')" class="btn btn-danger btn-xs">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

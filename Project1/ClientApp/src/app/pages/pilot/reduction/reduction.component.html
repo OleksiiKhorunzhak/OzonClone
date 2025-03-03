@@ -1,0 +1,58 @@
+<div *ngIf="flight">
+    <div *ngIf="isNextStep == true">
+    <div class="row">
+        <div class="col-6">
+            <div>
+                <label class="col-form-label">Дистанція (в км.)</label>
+
+                <select class="form-control" [(ngModel)]="flight.reductionDistance">
+                    <option *ngFor="let item of reductions" [value]="item" >{{item}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-6">
+            <div>
+                <label class="col-form-label">Населений пункт</label>
+                <input [(ngModel)]="flight.reductionLocation" type="text" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="mt-3 d-flex justify-content-end">
+                <button [disabled]="validateStep()" class="btn btn-success w-100"
+                    (click)="next()">
+                    <b>Підтвердити</b>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div *ngIf="isNextStep == false">
+        <div class="row">
+            <div class="col-12">
+                <div class="mt-3 d-flex justify-content-end">
+                    <button class="btn btn-success w-100"
+                        (click)="isNextStep = true">
+                        <b>Початок зниження</b>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="mt-3 d-flex justify-content-end">
+                    <button class="btn btn-light w-100"
+                        (click)="next(true)">
+                        <b>Пропустити</b>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

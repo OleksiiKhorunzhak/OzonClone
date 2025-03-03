@@ -1,0 +1,153 @@
+.dashboard-wrapper {
+    margin-left: auto;
+}
+
+.col-sm-6, .col-md-4, .col-lg-3 {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+.not-approved {
+    //border: 7px solid red;
+    /* Set border properties */
+    //border-radius: 5px;
+    /* Optional: Adjust border radius */
+    animation: shimmer 1500ms infinite;
+    /* Apply shimmer animation */
+}
+
+@keyframes shimmer {
+    0% {
+        background-color: white;
+        /* Start with transparent border */
+    }
+
+    25% {
+        background-color: var(--bg-color);
+        /* Halfway through, make the border visible */
+    }
+
+    50% {
+        background-color: var(--bg-color);
+        /* Halfway through, make the border visible */
+    }
+
+    100% {
+        background-color: white;
+        /* At the end, make it transparent again */
+    }
+}
+
+.blink-sign{
+    height: 25px;
+    width: 25px;
+    background-color: red;
+    border: 2px solid white;
+    margin-left: 6px;
+    animation: blink 1s infinite; /* Define the animation */
+    visibility: hidden; /* Initially hide the div */
+}
+
+@keyframes blink {
+    50% {
+        visibility: hidden; /* At 50% of the animation duration, hide the div */
+    }
+    100% {
+        visibility: visible; /* At the end of the animation duration, make the div visible */
+    }
+}
+
+.changed-route{
+    border: 3px solid red;
+    /* Set border properties */
+    border-radius: 5px;
+    /* Optional: Adjust border radius */
+    animation: route-changed 1500ms infinite;
+
+    margin-left: -10px;
+    padding-left: 7px;
+}
+
+@keyframes route-changed {
+    0% {
+        border-color: transparent;
+        /* Start with transparent border */
+    }
+
+    50% {
+        border-color: red;
+        /* Halfway through, make the border visible */
+    }
+
+    100% {
+        border-color: transparent;
+        /* At the end, make it transparent again */
+    }
+}
+
+.hidden{
+    display:none;
+}
+
+
+.btn-danger{
+    b{
+        color:black;
+    }
+}
+
+.btn-success{
+    b{
+        color:black;
+    }
+}
+
+.header-step{
+    display: flex;
+    justify-content: center;
+    span{
+    font-size: 17px !important;
+    }
+}
+
+a {
+    color: #007bff;
+}
+
+@keyframes blink-animation {
+    50% {
+      opacity: 1;
+    }
+}
+
+.waiting-approval-text{
+    color: blue;
+    animation: blink-animation 1.5s infinite; /* Change 2s to the desired interval */
+    opacity: 0;
+}
+
+.section-name{
+    color:black;
+    font-weight: bold;
+}
+
+.section-name::after{
+    content: '\00a0\00a0';
+}
+
+.section-value{
+    color:blue;
+    font-weight: bold;
+}
+
+.current-step{
+    border: 3px solid green;
+    /* Set border properties */
+    border-radius: 5px;
+    /* Optional: Adjust border radius */
+    margin-left: -10px;
+    padding-left: 7px;
+    margin-right: -7px;
+    padding-right: 4px;
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>ОЗОН</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+  </head>
+  <body>
+    <app-root></app-root>
+
+    <script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="./assets/vendor/slimscroll/jquery.slimscroll.js"></script>
+    <script src="./assets/libs/js/main-js.js"></script>
+    <script>
+      const version = "0.1.33";
+
+      const app_version = localStorage.getItem("APP_VERSION");
+
+      if (app_version === null || app_version !== version) {
+        localStorage.clear();
+        localStorage.setItem("APP_VERSION", version);
+      }
+    </script>
+    <!-- <script src="../assets/vendor/inputmask/js/jquery.inputmask.bundle.js"></script> -->
+  </body>
+</html>

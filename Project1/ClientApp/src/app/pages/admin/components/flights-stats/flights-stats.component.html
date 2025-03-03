@@ -1,0 +1,172 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <h3 class="mb-0">Польоти</h3>
+                    <div>
+                        <button (click)="selectAll()" class="btn btn-sm btn-info mr-1">
+                            Вибрати всі
+                        </button>
+                        <button (click)="selectAllUnfinished()" class="btn btn-sm btn-info mr-1">
+                            Вибрати завершені
+                        </button>
+
+                        <button class="btn btn-sm btn-danger mr-1" (click)="deleteSelected()">
+                            Видалити вибрані
+                        </button>
+                        <button [disabled]="isLoading" (click)="downloadFile()" class="btn btn-sm btn-success">
+                            <i *ngIf="!isLoading" class="fas fa-download">
+                            </i>
+                            <img *ngIf="isLoading" style="height: 15px; margin-top: -5px;"  src="../../../../../assets/images/spinner.gif" alt="">
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body" style="overflow-x: auto; overflow-y: auto; max-height: 75vh;">
+                    <table class="table table-striped" >
+                        <thead class="pointer">
+                            <tr>
+                                <th>
+                                    <button class="btn" (click)="selectAll()">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </th>
+                                <th scope="col">Місія</th>
+                                <th [appSort]="flights" data-order="desc" data-name="dateOfFlight" scope="col">
+                                    <b>Створений</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="assignment" scope="col"
+                                    data-type="value-color"><b>Призначення</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="model" scope="col"
+                                    data-type="value-color"><b>Дрон</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="unit" scope="col">
+                                    <b>Підрозділ</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="zone" scope="col"><b>Смуга</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="routeForward" scope="col">
+                                    <b>Машршрут вперед</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="changedForwardRoute" scope="col">
+                                    <b>Машршрут вперед змін</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="flightStartDate" scope="col"
+                                    data-type="date"><b>Виліт</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="LBZForwardDate" scope="col"
+                                    data-type="date"><b>ЛБЗ Вперед</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="returnDate" scope="col"
+                                    data-type="date"><b>Повернення</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="routeBack" scope="col">
+                                    <b>Машршрут назад</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="changedReturnRoute" scope="col">
+                                    <b>Машршрут назад змін</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="reductionDate" scope="col"
+                                    data-type="date"><b>Початок зниження:</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="LBZBackDate" scope="col"
+                                    data-type="date"><b>ЛБЗ назад</b></th>
+                                <th scope="col" data-type="date">Зниження</th>
+                                <th [appSort]="flights" data-order="desc" data-name="workingHeight" scope="col">
+                                    <b>Висота польоту</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="videoRange" scope="col"><b>Частота
+                                        відео</b></th>
+                                <th [appSort]="flights" data-order="desc" data-name="controlRange" scope="col">
+                                    <b>Частота керування</b>
+                                </th>
+                                <th [appSort]="flights" data-order="desc" data-name="taskPerformanceArea" scope="col">
+                                    <b>Район завдання</b></th>
+                                <th scope="col">Одобрено</th>
+                                <th scope="col">Заборона</th>
+                                <th scope="col">Скасованно пілотом</th>
+                                <th [appSort]="flights" data-order="desc" data-name="boardingStatus" scope="col">
+                                    Посадка</th>
+                                <th scope="col">Статус</th>
+                                <th scope="col">Закінчення</th>
+                                <th scope="col">Видалити</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of flights">
+                                <td>
+                                    <label class="custom-control custom-checkbox custom-control-inline">
+                                        <input [(ngModel)]="item.isCheckedAdmin" type="checkbox" class="custom-control-input"><span class="custom-control-label"></span>
+                                    </label>
+                                </td>
+                                <td>{{ item.dateOfFlight | date: 'ddMMyy-HHmm' }}-{{item.operator}}
+                                </td> <!--Місія-->
+                                <td>{{item.dateOfFlight | date: 'dd/MM/yy HH:mm'}}</td>
+                                <td>{{ item.assignment!.name }}</td> <!--Дрон-->
+                                <td>{{ item.model!.name }}</td> <!--Призначення-->
+                                <td>{{ item.unit }}</td> <!--Підрозділ-->
+                                <td>{{ item.zone }}</td> <!--Смуга-->
+                                <td>{{ item.routeForward }}</td> <!--Машршрут вперед-->
+                                <td>{{ item.changedForwardRoute }}</td> <!--Машршрут вперед змін-->
+                                <td>{{ item.flightStartDate | date : 'dd/MM/yy HH:mm' }}</td> <!--Виліт-->
+                                <td>{{ item.LBZForwardDate | date : 'dd/MM/yy HH:mm' }}</td> <!--ЛБЗ Вперед-->
+                                <td>{{ item.returnDate | date : 'dd/MM/yy HH:mm' }}</td> <!--Повернення-->
+                                <td>{{ item.routeBack }}</td> <!--Машршрут назад-->
+                                <td>{{ item.changedReturnRoute }}</td> <!--Машршрут назад змін-->
+                                <td>{{ item.reductionDate | date : 'dd/MM/yy HH:mm' }}</td> <!--Зниження-->
+                                <td>{{ item.LBZBackDate | date : 'dd/MM/yy HH:mm' }}</td> <!--ЛБЗ назад-->
+                                <td *ngIf="item.hasOwnProperty('reductionDistance')"> <!--Зниження-->
+                                    {{ item.reductionDistance}} км. Район {{ item.reductionLocation}}
+                                </td>
+                                <td *ngIf="!item.hasOwnProperty('reductionDistance')"></td> <!--Зниження порожнє-->
+                                <td>{{item.workingHeight}}</td> <!--Висота польоту-->
+                                <td>{{item.videoRange}}</td> <!--Частота відео-->
+                                <td>{{item.controlRange}}</td> <!--Частота керування-->
+                                <td>{{item.taskPerformanceArea}}</td> <!--Район завдання-->
+                                <td> <!--Одобрено-->
+                                    {{
+                                    item.flightStep.isApproved ? 'Так' : 'Ні'
+                                    }}
+                                </td>
+
+                                <td>
+                                    <span *ngIf="item.isRejectedbyAdmin == true">
+                                        <b>Заборонено Черговим по причині:</b> {{item.rejectedReason}}
+                                    </span>
+
+                                    <span *ngIf="item.isRejectedbyPPO == true">
+                                        <b>Заборонено ППО по причині:</b> {{item.rejectedReason}}
+                                    </span>
+
+                                    <span *ngIf="item.isRejectedbyREB == true">
+                                        <b>Заборонено РЕБ по причині:</b> {{item.rejectedReason}}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span *ngIf="item.isTerminated">
+                                        {{ item.terminatedPilotReason }}
+                                    </span>
+                                </td>
+                                <td>{{item.boardingStatus}}</td>
+                                <td>
+                                    {{
+                                    item.flightStep.step == FlightSteps.START ? 'Початок' :
+                                    item.flightStep.step == FlightSteps.FLIGHT ? 'Політ' :
+                                    item.flightStep.step == FlightSteps.LBZ_FORWARD ? 'ЛБЗ Вперед' :
+                                    item.flightStep.step == FlightSteps.RETURN ? 'Повернення' :
+                                    item.flightStep.step == FlightSteps.LBZ_HOME ? 'ЛБЗ Назад' :
+                                    item.flightStep.step == FlightSteps.REDUCTION ? 'Початок зниження' :
+                                    'Завершено'
+                                    }}</td> <!--Статус-->
+    
+                                <td>{{item.endDate | date: 'dd/MM/yy HH:mm'}}</td>
+                                <td>
+                                    <button (click)="removeFlight(item._id)" class="btn btn-danger btn-xs">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>

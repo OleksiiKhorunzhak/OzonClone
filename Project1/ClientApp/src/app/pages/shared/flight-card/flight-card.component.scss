@@ -1,0 +1,67 @@
+.hidden{
+    display:none;
+}
+
+
+.btn-danger{
+    b{
+        color:black;
+    }
+}
+
+.btn-success{
+    b{
+        color:black;
+    }
+}
+
+.header-step{
+    display: flex;
+    justify-content: center;
+    span{
+    font-size: 17px !important;
+    }
+}
+
+.alert-info{
+    background-color: white !important;
+}
+
+a {
+    color: #007bff;
+}
+
+@keyframes blink-animation {
+    50% {
+      opacity: 1;
+    }
+}
+
+.waiting-approval-text{
+    color: blue;
+    animation: blink-animation 1.5s infinite; /* Change 2s to the desired interval */
+    opacity: 0;
+}
+
+.section-name{
+    color:black;
+    font-weight: bold;
+}
+
+.section-name::after{
+    content: '\00a0\00a0';
+}
+
+.section-value{
+    color:blue;
+    font-weight: bold;
+}
+
+.current-step{
+    border: 3px solid green;
+    /* Set border properties */
+    border-radius: 5px;
+    /* Optional: Adjust border radius */
+    margin-left: -10px;
+    padding-left: 7px;
+}

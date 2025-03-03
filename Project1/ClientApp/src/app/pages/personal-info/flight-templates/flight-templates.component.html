@@ -1,0 +1,104 @@
+
+
+
+
+
+
+  <app-sidebar></app-sidebar>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-ecommerce">
+        <div class="container-fluid dashboard-content ">
+
+
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <div class="section-block" id="basicform">
+                        <h3 class="section-title">Редагування персональних данних</h3>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" *ngIf="template">
+                          <div >
+                            <div class="row">
+                              <div class="col-12">
+                                <label required class="col-form-label">Назва шаблону</label>
+                                <input [(ngModel)]="template.templateName" type="text" class="form-control">
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-12">
+                                <label class="col-form-label">Тип дрону</label>
+                                <ng-select class="select-with-border"
+                                  [(ngModel)]="template.assignment">
+                                  <ng-option *ngFor="let item of options.dronAppointment" [value]="item">
+                                    <span [style.backgroundColor]="item.color" class="badge">{{item.name}}</span>
+                                  </ng-option>
+                                </ng-select>
+                              </div>
+                              <div class="col-12">
+                                <div>
+                                  <label class="col-form-label">Модель</label>
+                                  <ng-select class="select-with-border"
+                                    [(ngModel)]="template.model">
+                                    <ng-option *ngFor="let item of options.dronModels" [value]="item">
+                                      <span [style.backgroundColor]="item.color" class="badge">{{item.name}}</span>
+                                    </ng-option>
+                                  </ng-select>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-6">
+                                <div>
+                                  <label class="col-form-label">Частота керування (МГц)</label>
+                                  <input
+                                    [(ngModel)]="template.controlRange" type="text" class="form-control"
+                                    aria-describedby="addon-mh">
+                                </div>
+                              </div>
+                              <div class="col-6">
+                                <div>
+                                  <label class="col-form-label">Частота відео (МГц)</label>
+                                  <input
+                                    [(ngModel)]="template.videoRange" type="text" class="form-control">
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-6">
+                                <div>
+                                  <label class="col-form-label">Висота польоту (метри)</label>
+                                  <input
+                                  [(ngModel)]="template.workingHeight" type="text" class="form-control">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-12">
+                                <div class="mt-3 d-flex justify-content-end">
+                                  <button *ngIf="templateId == null" [disabled]="validateTemplate()" (click)="createTemplate()" href="#"
+                                    class="btn btn-success w-100">
+                                    Створити шаблон
+                                    <i class="fas fa-arrow-right"></i>
+                                  </button>
+
+                                  <button *ngIf="templateId != null" [disabled]="validateTemplate()" (click)="editTemplate()" href="#"
+                                    class="btn btn-success w-100">
+                                    Змінити шаблон
+                                    <i class="fas fa-arrow-right"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

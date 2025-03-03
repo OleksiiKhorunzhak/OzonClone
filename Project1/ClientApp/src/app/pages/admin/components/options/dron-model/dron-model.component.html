@@ -1,0 +1,60 @@
+<div class="tab-regular">
+    <div class="tab-content" id="myTabContent">
+        <!-- Статус повернення -->
+        <div class="tab-pane fade show active" id="dronModel" role="tabpanel"
+            aria-labelledby="home-tab">
+
+            <div class="row pb-2">
+                <div class="col-md-10 col-12 mb-2">
+                    <input [(ngModel)]="name" placeholder="Назва" type="text" class="form-control">
+                </div>
+
+                <div class="col-md-2 col-12 mb-2">
+                    <button (click)="addNewOption('dronModel')" class="btn btn-primary btn-sm w-100">Створити</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Назва</th>
+                                <th scope="col">Змінити</th>
+                                <th scope="col">Видалити</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of options.dronModels; index as i">
+                                <th scope="row">{{i+1}}</th>
+                                <td *ngIf="selectedOption !== i">{{ item.name }}</td>
+                                <td *ngIf="selectedOption === i">
+                                    <input [(ngModel)]="name" placeholder="Назва" type="text" class="form-control">
+                                </td>
+                                <td *ngIf="selectedOption !== i">
+                                    <button (click)="editOption(i,'dronModel')" class="btn btn-info btn-xs">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+
+                                <td *ngIf="selectedOption === i">
+                                    <button (click)="addNewOption('dronModel')" class="btn btn-info btn-xs">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </td>
+
+                                <td>
+                                    <button (click)="removeOption(i,'dronModel')" class="btn btn-danger btn-xs">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

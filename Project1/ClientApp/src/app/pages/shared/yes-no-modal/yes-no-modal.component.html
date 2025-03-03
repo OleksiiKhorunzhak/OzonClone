@@ -1,0 +1,24 @@
+
+<div class="modal-header">
+    <h4 *ngIf="title" class="modal-title">{{title}}</h4>
+    <!-- <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button> -->
+</div>
+<div class="modal-body">
+    <h1 class="text-center">
+        <b>{{text}}</b>
+        
+    </h1>
+</div>
+<div class="modal-footer justify-content-between">
+    <button type="button" style="width: 45%" class="btn btn-lg btn-success btn-outline-dark" (click)="activeModal.close(true)">
+        <h1>
+            {{yes}}
+        </h1>
+    </button>
+    <button type="button" style="width: 45%" class="btn btn-lg btn-danger btn-outline-dark" (click)="activeModal.close(false)">
+        <h1>
+            {{no}}
+        </h1>
+        
+    </button>
+</div>

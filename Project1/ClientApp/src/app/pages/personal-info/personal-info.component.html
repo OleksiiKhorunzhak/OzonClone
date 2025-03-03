@@ -1,0 +1,120 @@
+<app-sidebar></app-sidebar>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-ecommerce">
+        <div class="container-fluid dashboard-content ">
+
+
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <div class="section-block" id="basicform">
+                        <h3 class="section-title">Редагування персональних данних</h3>
+                    </div>
+                    <div class="card">
+                        <h5 *ngIf="userRole != (UserRoles.PPO || UserRoles.REB)" class="card-header">Юзер : {{userInfo.login}}</h5>
+                        <div *ngIf="userRole != (UserRoles.PPO || UserRoles.REB)" class="card-body">
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="inputText3" class="col-form-label">Позивний</label>
+                                        <input readonly [(ngModel)]="userInfo!.userOptions!.nickName" type="text"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="inputText3" class="col-form-label">Підрозділ</label>
+                                        <input [(ngModel)]="userInfo!.userOptions!.unit" type="text"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-success" (click)="saveChanges()">Зберегти зміни</button>
+                            </div>
+
+
+                        </div>
+                        <h5 class="card-header">Зміна паролю</h5>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="inputText3" class="col-form-label">Старий пароль</label>
+                                        <input [(ngModel)]="oldPassword" type="password" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="inputText3" class="col-form-label">Новий пароль</label>
+                                        <input [(ngModel)]="newPassword" type="password" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-success" (click)="changePassword()">Змінити пароль</button>
+                            </div>
+                        </div>
+
+                        <h5 *ngIf="userRole != (UserRoles.PPO || UserRoles.REB)" class="card-header">Шаблони</h5>
+                        <div *ngIf="userRole != (UserRoles.PPO || UserRoles.REB)" class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-md-8 col-lg-10">
+                                    <ul style="max-height: 200px; overflow-y: auto;" class="list-group mb-2" >
+                                        <li *ngFor="let template of userInfo.userOptions?.templates" class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <b>
+                                                        {{template.templateName}}
+                                                    </b>
+                                                    <span [style.backgroundColor]="template.assignment?.color" class="badge">
+                                                        {{template.assignment?.name}}
+                                                    </span>
+                                                    <span [style.backgroundColor]="template.model?.color" class="badge">
+                                                        {{template.model?.name}}
+                                                    </span>
+                                                    <span class="badge badge-info">
+                                                        <b>ДЧ Керування: </b>
+                                                         {{template.controlRange}}
+
+                                                    </span>
+                                                    <span class="badge badge-info">
+                                                        <b>ДЧ відео: </b>
+                                                        {{template.videoRange}}
+                                                    </span>
+                                                    <span class="badge badge-info">
+                                                        <b>Роб. висота: </b>
+                                                        {{template.workingHeight}}
+                                                    </span>
+                                                    
+                                                    
+                                                </div>
+                                                
+                                                <div>
+                                                    <i class="fas fa-edit pointer m-2" (click)="editTemplate(template.id!)"></i>
+                                                    <i class="fas fa-trash pointer m-2" (click)="removeTemplate(template.id!)"></i>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-12 col-md-4 col-lg-2">
+                                
+                                    <div class="d-flex ">
+                                        <button class="btn btn-success w-100" (click)="createTemplate()">Створити шаблон</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

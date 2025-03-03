@@ -1,0 +1,286 @@
+<div>
+  <div class="row">
+    <div class="col-12">
+      <label class="col-form-label">Вибір шаблону</label>
+      <ng-select class="select-with-border" (change)="templateSelected()" [(ngModel)]="selectedTemplate">
+        <ng-option
+          *ngFor="let template of userInfo.userOptions?.templates"
+          [value]="template"
+        >
+          <span class="badge">{{ template.templateName }}</span>
+        </ng-option>
+      </ng-select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 col-lg-6">
+      <label class="col-form-label">Позивний</label>
+      <input readonly [class.invalid-field]="flight.operator == null || flight.operator == ''"
+        [disabled]="
+          flight.flightStep.step != FlightSteps.START ||
+          (flight.flightStep.step == FlightSteps.START &&
+            flight.flightStep.isApproved == true)
+        "
+        [(ngModel)]="flight.operator"
+        type="text"
+        class="form-control"
+      />
+    </div>
+    <div class="col-md-12 col-lg-6">
+      <label class="col-form-label">Підрозділ</label>
+      <input [class.invalid-field]="flight.unit == null || flight.unit == ''"
+        [disabled]="
+          flight.flightStep.step != FlightSteps.START ||
+          (flight.flightStep.step == FlightSteps.START &&
+            flight.flightStep.isApproved == true)
+        "
+        [(ngModel)]="flight.unit"
+        type="text"
+        class="form-control"
+      />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Смуга виконання завдання</label>
+        <input [class.invalid-field]="flight.zone == null || flight.zone == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.zone"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">РВЗ</label>
+        <input [class.invalid-field]="flight.taskPerformanceArea == null || flight.taskPerformanceArea == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.taskPerformanceArea"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <label class="col-form-label">Тип дрону</label>
+      <ng-select class="select-with-border" [class.invalid-field]="flight.assignment?.name == null || flight.assignment?.name == ''"
+        [disabled]="
+          flight.flightStep.step != FlightSteps.START ||
+          (flight.flightStep.step == FlightSteps.START &&
+            flight.flightStep.isApproved == true)
+        "
+        [(ngModel)]="flight.assignment"
+      >
+        <ng-option *ngFor="let item of options.dronAppointment" [value]="item">
+          <span [style.backgroundColor]="item.color" class="badge">{{
+            item.name
+          }}</span>
+        </ng-option>
+      </ng-select>
+    </div>
+    <div class="col-12">
+      <div>
+        <label class="col-form-label">Модель</label>
+        <ng-select class="select-with-border" [class.invalid-field]="flight.model?.name == null || flight.model?.name == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.model"
+        >
+          <ng-option *ngFor="let item of options.dronModels" [value]="item">
+            <span [style.backgroundColor]="item.color" class="badge">{{
+              item.name
+            }}</span>
+          </ng-option>
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Частота керування (МГц)</label>
+        <input [class.invalid-field]="flight.controlRange == null || flight.controlRange == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.controlRange"
+          type="text"
+          class="form-control"
+          aria-describedby="addon-mh"
+        />
+      </div>
+    </div>
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Частота відео (МГц)</label>
+        <input [class.invalid-field]="flight.videoRange == null || flight.videoRange == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.videoRange"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Маршрут до ЛБЗ (населені пункти)</label>
+        <input [class.invalid-field]="flight.routeForward == null || flight.routeForward == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.routeForward"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Маршрут від ЛБЗ (населені пункти)</label>
+        <input [class.invalid-field]="flight.routeBack == null || flight.routeBack == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.routeBack"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Висота польоту (метри)</label>
+        <input [class.invalid-field]="flight.workingHeight == null || flight.workingHeight == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.workingHeight"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <div class="col-md-12 col-lg-6">
+      <div>
+        <label class="col-form-label">Посилання на стрім</label>
+        <input [class.invalid-field]="flight.streamLink == null || flight.streamLink == ''"
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.streamLink"
+          type="text"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div>
+        <label class="col-form-label">Діскорд</label>
+        <div class="alert alert-secondary">
+          <a target="_blank" [href]="flight.discordUrl">
+            {{ flight.discordUrl }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <label class="custom-control custom-checkbox">
+        <input
+          required
+          [disabled]="
+            flight.flightStep.step != FlightSteps.START ||
+            (flight.flightStep.step == FlightSteps.START &&
+              flight.flightStep.isApproved == true)
+          "
+          [(ngModel)]="flight.isInDiscord"
+          type="checkbox"
+          checked=""
+          class="custom-control-input"
+        />
+        <span class="custom-control-label" style="font-weight: bold; color: black;">
+          Зайшов у Діскорд <b>(обов'язково)</b>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="mt-3 d-flex justify-content-end">
+        <button
+          *ngIf="!flight._id"
+          (click)="getLastFlight()"
+          href="#"
+          class="btn btn-warning w-100"
+        >
+          <b>Створити згідно останньої заявки</b>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="mt-3 d-flex justify-content-end">
+        <button
+          *ngIf="!flight._id"
+          [disabled]="validateStep()"
+          (click)="createFlight()"
+          href="#"
+          class="btn btn-success w-100"
+        >
+          <b>Створити політ</b>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

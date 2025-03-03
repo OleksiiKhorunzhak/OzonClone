@@ -1,0 +1,28 @@
+.btn-success{
+    height: 31vh;
+    b{
+        font-size: 3vh;
+        color:black;
+    }
+    i{
+        font-size: 3vh;
+        color:black;
+    }
+}
+
+.select-with-border{
+    border: 1.5px solid black;
+}
+
+input{
+    border: 1.5px solid black;
+}
+
+.col-form-label{
+    font-weight: bold;
+    color: black;
+}
+
+.invalid-field {
+    border: 3px solid red;
+}

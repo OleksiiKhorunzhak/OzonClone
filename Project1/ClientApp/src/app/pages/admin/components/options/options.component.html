@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-12">
+        <div class="section-block">
+            <h4 class="section-title">Редагування опцій</h4>
+        </div>
+
+        <div class="tab-regular">
+            <ul class="nav nav-tabs " id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a (click)="changeLocalRoute('dronAppointment')" class="nav-link p-2" data-toggle="tab" href="#dronAppointment"
+                        role="tab" aria-controls="home" aria-selected="true">
+                        Призначення Дронів
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a (click)="changeLocalRoute('dronModel')" class="nav-link p-2" data-toggle="tab" href="#dronModel" role="tab"
+                        aria-controls="home" aria-selected="true">
+                        Моделі дронів
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a (click)="changeLocalRoute('flightStatus')" class="nav-link p-2" data-toggle="tab" href="#flightStatus" role="tab"
+                        aria-controls="home" aria-selected="true">
+                        Статус польотів
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a (click)="changeLocalRoute('discrodUrl')"class="nav-link p-2" data-toggle="tab" href="#discrodUrl" role="tab"
+                        aria-controls="home" aria-selected="true">
+                        Посилання на діскорд
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <app-dron-appointment-option *ngIf="defaultTabSelected == 'dronAppointment'" [options]='options'></app-dron-appointment-option>
+                <app-dron-model-option *ngIf="defaultTabSelected == 'dronModel'" [options]='options'></app-dron-model-option>
+                <app-flight-status-option *ngIf="defaultTabSelected == 'flightStatus'" [options]='options'></app-flight-status-option>
+                <app-discord-option *ngIf="defaultTabSelected == 'discrodUrl'" [options]='options'></app-discord-option>
+            </div>
+        </div>
+    </div>
+</div>

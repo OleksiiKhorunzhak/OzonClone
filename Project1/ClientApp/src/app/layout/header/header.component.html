@@ -1,0 +1,74 @@
+<div class="dashboard-header">
+    <nav class="navbar navbar-expand-md bg-white fixed-top">
+        <span class="navbar-brand">ОЗОН</span>
+
+        <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button> -->
+        <div class="collapse navbar-collapse " id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto navbar-right-top">
+
+                <li *ngIf="userInfo.role != userRoles.PILOT" class="nav-item">
+                    <input style="width: 160px; padding: 2px; margin-top: 10px;" (colorPickerChange)="onColorChanged($event)" [(colorPicker)]="backgroundColor"
+                        placeholder="Оберіть колір" type="text" class="form-control">
+                </li>
+
+                <li *ngIf="userInfo.role == userRoles.ADMIN" a class="nav-item">
+                    <a routerLink="admin" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-cog"></i>
+                        Адмін
+                    </a>
+                </li>
+
+                <li *ngIf="userInfo.role == userRoles.PPO" class="nav-item">
+                    <a routerLink="ppo" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-rocket"></i>
+                        ППО
+                    </a>
+                </li>
+
+                <li *ngIf="userInfo.role == userRoles.REB" class="nav-item">
+                    <a routerLink="ppo" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-rocket"></i>
+                        РЕБ
+                    </a>
+                </li>
+
+                <li *ngIf="userInfo.role == userRoles.ADMIN" class="nav-item">
+                    <a routerLink="ppo" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-rocket"></i>
+                        ППО/РЕБ/БпС
+                    </a>
+                </li>
+
+                <li *ngIf="userInfo.role == userRoles.BRIGADE_ADMIN || userInfo.role == userRoles.BRIGADE_REB || userInfo.role == userRoles.BRIGADE_PPO" class="nav-item">
+                    <a routerLink="brigade" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-rocket"></i>
+                        ППО/РЕБ/БпС
+                    </a>
+                </li>
+
+                <li  *ngIf="userInfo.role == userRoles.ADMIN || userInfo.role == userRoles.PILOT" class="nav-item">
+                    <a disabled="true" [routerLink]="!currentUrl.includes('flight')? 'flight' : null" class="nav-link nav-icons" href="#">
+                        <i class="fas fa-fw fa-user"></i>
+                        Політ
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown nav-user pointer">
+                    <a class="nav-link nav-user-img" id="navbarDropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right nav-user-dropdown" aria-labelledby="navbarDropdownMenuLink2">
+                        <div class="nav-user-info">
+                            <h5 class="mb-0 text-white nav-user-name">{{userInfo.login}}</h5>
+                            <span class="status"></span><span class="ml-2">{{userInfo.userOptions?.nickName}}</span>
+                        </div>
+                        <a class="dropdown-item" routerLink="personal-info" ><i class="fas fa-user mr-2"></i>Аккаунт</a>
+                        <a (click)="logout()" class="dropdown-item pointer"><i class="fas fa-power-off mr-2"></i>Вийти</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
