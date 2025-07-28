@@ -34,7 +34,7 @@
               </div>
 
               <div class="header-step mb-1" >
-                <span [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
+                <span *ngIf="!flight.hasOwnProperty('isEmergencyStopByAdmin') || flight.isEmergencyStopByAdmin == false" [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
                   [ngbPopover]="flight.timeFromLastStep" triggers="mouseenter:mouseleave" placement="right"
                   popoverTitle="Час у поточному статусі" class="badge badge-primary" style="color: white;">
                   {{
@@ -44,7 +44,12 @@
                   }}
                 </span>
                 <div>
-                  <span *ngIf="flight.flightStep.step === this.FlightSteps.END" [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
+                  <span *ngIf="flight.flightStep.step === this.FlightSteps.END && flight.boardingStatus == 'ЗЕМЛЯ'" [style.backgroundColor]="this.flightStatuses[flight.flightStep.visibleStep ?? 0].color"
+                    class="badge badge-primary" style="color: white;">
+                    {{ flight.boardingStatus?.toUpperCase() }}
+                  </span>
+
+                  <span *ngIf="flight.flightStep.step === this.FlightSteps.END && flight.boardingStatus != 'ЗЕМЛЯ'" [style.backgroundColor]="'#FF0000'"
                     class="badge badge-primary" style="color: white;">
                     {{ flight.boardingStatus?.toUpperCase() }}
                   </span>
@@ -95,8 +100,8 @@
                 [class.hidden]="!flight.isExpanded"
               >
                 <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.START">
-                    <span class="section-name">Місія:</span>
-                    <span class="section-value">{{ flight.dateOfFlight | date: 'ddMMyy-HHmm' }}-{{flight.operator}}</span>
+                    <span class="section-name">Створений:</span>
+                    <span class="section-value">{{ flight.dateOfFlight | date: 'dd/MM/yy HH:mm' }}</span>
                 </div>
                 <div [class.current-step]="flight.flightStep.visibleStep == FlightSteps.FLIGHT" 
                       style="display: flex; justify-content: space-between; cursor: pointer;">
@@ -197,9 +202,9 @@
               </div>
 
               <div
-                *ngIf="flight.flightStep.isApproved == false"
-                class="alert alert-warning mt-2 mb-0"
-                style="background-color: white;"
+              *ngIf="flight.flightStep.isApproved == false"
+              class="alert alert-warning mt-2 mb-0"
+              style="background-color: white;"
               >
                 <div class="waiting-approval-text" *ngIf="flight.flightStep.isApprovedByPPO == false" style="border-bottom: 2px solid black;">
                   <b >Очікується дозвіл ППО</b>

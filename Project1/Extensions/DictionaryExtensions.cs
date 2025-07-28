@@ -2,11 +2,21 @@
 
 public static class DictionaryExtensions
 {
-    public static string GetStatus(this IDictionary<string, object>? record)
+    public static string GetStatus(this IDictionary<string, object>? record, string stepName)
     {
         try
         {
-            int step = (int)(record["flightStep"] as IDictionary<string, object>)["step"];
+            if (record is null || !record.ContainsKey("flightStep"))
+            {
+                return string.Empty;
+            }
+
+            if (!((Dictionary<string, object>)record["flightStep"]).ContainsKey(stepName))
+            {
+                return string.Empty;
+            }
+
+            int step = (int)((IDictionary<string, object>)record["flightStep"])[stepName];
 
             return step switch
             {

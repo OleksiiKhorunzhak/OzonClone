@@ -1,0 +1,43 @@
+name: Trigger auto deployment for litak-temp-ca
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - 'Project1/**'
+    - '.github/workflows/litak-temp-ca-AutoDeployTrigger-841f3d56-fa0b-4a3f-be3d-2ac59716e9db.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.LITAKTEMPCA_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/Project1 
+          registryUrl: litaktempacr.azurecr.io
+          registryUsername: ${{ secrets.LITAKTEMPCA_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.LITAKTEMPCA_REGISTRY_PASSWORD }}
+          containerAppName: litak-temp-ca
+          resourceGroup: Test
+          imageToBuild: litaktempacr.azurecr.io/litak-temp-ca:${{ github.sha }}
+          
+            
+
+     
+

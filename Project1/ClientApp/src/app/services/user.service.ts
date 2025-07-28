@@ -12,6 +12,7 @@ export class UserService {
   private readonly USERS_API = API_URL + 'Users';
 
   private readonly USERINFO_KEY = 'USER_INFO';
+  private readonly USER_BACKGROUND_COLOR = 'BG_COLOR';
 
   constructor(public http: HttpClient) { }
 
@@ -125,6 +126,14 @@ export class UserService {
     }
 
     return JSON.parse(data);
+  }
+
+  public setUserBackgroundColor(color: string){
+    localStorage.setItem(this.USER_BACKGROUND_COLOR, color);
+  }
+
+  public getUserBackgroundColor() : string | null{
+    return localStorage.getItem(this.USER_BACKGROUND_COLOR);
   }
 
   public logout(): void {

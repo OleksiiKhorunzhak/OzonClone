@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Flight } from '../models/flight';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, timeout } from 'rxjs';
 import { API_URL } from '../consts/consts';
 import { UserService } from './user.service';
 
@@ -34,8 +34,21 @@ export class FlightService {
   }
 
   public async getFlightsWithTimeRange(timeRange: number): Promise<Flight[]> {
-    const flights = await lastValueFrom(this.http.get<Flight[]>(this.RECORDS_URL + '/GetNotFinishedRecordsOrItTenMinutesRange?timeRange=' + timeRange ));
-    return flights ?? [];
+    try {
+      const flights = await lastValueFrom(
+        this.http.get<Flight[]>(this.RECORDS_URL + '/GetNotFinishedRecordsOrItTenMinutesRange?timeRange=' + timeRange).pipe(timeout(5000))
+      );
+      return flights ?? [];
+    } catch (error: any) {
+      if (error.name === 'TimeoutError') {
+        console.error("Request timed out.");
+      } else {
+        console.error("Error in getFlightsWithTimeRange:", error);
+      }
+      
+      window.location.reload();
+      throw error;
+    }
   }
 
   public async refreshActiveFlight() {
@@ -76,14 +89,14 @@ export class FlightService {
   }
 
   public async addFlightAsync(flight: Flight): Promise<void> {
-    await lastValueFrom(this.http.post(this.RECORDS_URL, flight));
+     await this.http.post(this.RECORDS_URL, flight).toPromise();
   }
 
   public async updateFlightAsync(flight: Flight): Promise<void> {
     const id = flight._id;
     delete flight._id;
     
-    await lastValueFrom(this.http.put(this.RECORDS_URL + `?recordId=${id}`, flight));
+    await lastValueFrom(this.http.put(this.RECORDS_URL + `?recordId=${id}`, flight).pipe(timeout(5000)));
 
     flight._id = id;
   }

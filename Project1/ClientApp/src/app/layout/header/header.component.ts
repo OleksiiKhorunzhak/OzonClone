@@ -21,6 +21,7 @@ export class HeaderComponent implements OnInit{
   
   onColorChanged(val: string) {
     document.getElementById('mainWrapper')!.style.backgroundColor = val;
+    this.userService.setUserBackgroundColor(document.getElementById('mainWrapper')!.style.backgroundColor);
   }
 
   constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) { }
@@ -30,6 +31,11 @@ export class HeaderComponent implements OnInit{
 
     if(ui) {
       this.userInfo = ui;
+
+      const bgColor = this.userService.getUserBackgroundColor();
+      if(bgColor){
+        document.getElementById('mainWrapper')!.style.backgroundColor = bgColor;
+      }
     }
     
     this.router.events.pipe(filter(x => x instanceof NavigationEnd || x instanceof Scroll)).subscribe(x => {

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, Subscription, interval, takeUntil } from 'rxjs';
+import { Subject, Subscription, exhaustMap, interval, mergeMap, takeUntil } from 'rxjs';
 import { ValueColor } from 'src/app/models/droneModel';
 import { Flight, FlightSteps } from 'src/app/models/flight';
 import { DroneOptions } from 'src/app/models/options';
@@ -25,7 +25,8 @@ export interface CompletedFlight {
 export interface CheckedFlights {
   checkedLBZForwardChange: string[],
   checkedLBZBackChange: string[],
-  checkedIsApproved: string[]
+  checkedIsApproved: string[],
+  expanded: string[]
 }
 
 
@@ -71,7 +72,7 @@ export class BrigadeComponent implements OnInit, OnDestroy {
     flight.isExpanded = !flight.isExpanded;
 
     const checkedFlights = this.getCheckedFlights();
-
+    this.addExpandedFlightToInMemoryCache(flight, checkedFlights);
     if (flight.isForwardChanged === true && !checkedFlights.checkedLBZForwardChange.includes(flight._id!)) {
       checkedFlights.checkedLBZForwardChange.push(flight._id!);
       flight.isChecked = true;
@@ -92,27 +93,33 @@ export class BrigadeComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     await this.getOptions();
-    await this.initFlights();
 
     var ui = this.userService.getUserInfo();
-
     if (ui) {
       this.userRole = ui.role;
     }
+
+    await this.initFlights();
 
     if (this.options.flightStatus) {
       this.flightStatuses = this.options.flightStatus;
     }
 
-    this.refreshFlightSubscription = interval(this.interval_ms).pipe(takeUntil(this.gotError$)).subscribe(async x => {
-      this.completedFlights.forEach(flight => {
-        flight.msElapsed += this.interval_ms;
+    this.refreshFlightSubscription = interval(this.interval_ms).pipe(
+      takeUntil(this.gotError$),
+      mergeMap(async () => {
+        this.completedFlights.forEach(flight => {
+          flight.msElapsed += this.interval_ms;
+        });
+    
+        // Filter out completed flights
+        this.flights = this.flights.filter(x => !this.completedFlights.find(completed => completed.flight._id === x._id));
+        this.completedFlights = this.completedFlights.filter(x => x.msElapsed < (this.interval_ms * 5));
+    
+        // Call initFlights only after handling completed flights
+        await this.initFlights();
       })
-
-      this.flights = this.flights.filter(x => !this.completedFlights.find(completed => completed.flight._id === x._id))
-      this.completedFlights = this.completedFlights.filter(x => x.msElapsed < (this.interval_ms * 5));
-      await this.initFlights();
-    })
+    ).subscribe();
   }
 
   public async getOptions() {
@@ -128,11 +135,20 @@ export class BrigadeComponent implements OnInit, OnDestroy {
   }
 
   async initFlights() {
-    const nonCollapsedFlights = this.flights.filter(x => x.isExpanded === true);
-    const collapsedFlights = this.flights.filter(x => x.isExpanded == false);
+    if(!this.options){
+      await this.getOptions();
+    }
+
+    if (this.options.flightStatus && !this.flightStatuses) {
+      this.flightStatuses = this.options.flightStatus;
+    }
+
+    const checkedFlights = this.getCheckedFlights();
 
     try {
       const allFlights = await this.flightService.getFlightsWithTimeRange(this.timeRangeMinutes);
+      const nonCollapsedFlights = allFlights.filter(x => checkedFlights.expanded.includes(x._id!));
+      const collapsedFlights = allFlights.filter(x => !checkedFlights.expanded.includes(x._id!));
 
       const filtered = allFlights.filter(x => !x.isRejected);
 
@@ -140,6 +156,8 @@ export class BrigadeComponent implements OnInit, OnDestroy {
 
       const notApprovedFlights = filtered.filter(x => x.flightStep.isApproved === false)
 
+      const flightWithLost = filtered.filter(x => x.flightStep.step === FlightSteps.END && x.boardingStatus == 'ВТРАЧЕНО');
+      newFlights.push(...flightWithLost);
       newFlights.push(...notApprovedFlights)
 
       newFlights.push(...filtered.filter(x => x.flightStep.step == FlightSteps.START && x.flightStep.isApproved === true));
@@ -156,60 +174,25 @@ export class BrigadeComponent implements OnInit, OnDestroy {
           }));
       });
 
-      newFlights.push(...filtered.filter(x => x.flightStep.step === FlightSteps.END).sort((a: Flight, b: Flight) => {
+      newFlights.push(...filtered.filter(x => x.flightStep.step === FlightSteps.END && x.boardingStatus !== 'ВТРАЧЕНО')
+        .sort((a: Flight, b: Flight) => {
         const endDateA = new Date(a.endDate ?? '').getTime();
         const endDateB = new Date(b.endDate ?? '').getTime();
         return endDateB - endDateA;
       }));
 
       newFlights.forEach(flight => {
-
-        this.calculateTimePassed(flight);
-
-        if (flight.flightStep.step == FlightSteps.END) {
-          flight.flightStep.visibleStep = FlightSteps.END;
-          flight.assignment!.color = 'gray';
-          if (!this.endOptions.includes(flight.boardingStatus ?? '')) {
-            flight.boardingStatus = 'Інше';
-          }
-        }
-      });
-
-      newFlights.forEach(updatedFlight => {
-        // Find the corresponding collapsed flight
-        const nonCollapsedFlight = nonCollapsedFlights.find(flight => flight._id === updatedFlight._id);
-        if (nonCollapsedFlight && nonCollapsedFlight.isExpanded !== updatedFlight.isExpanded) {
-          updatedFlight.isExpanded = nonCollapsedFlight.isExpanded;
-        }else{
-          const collapsedFlight = collapsedFlights.find(flight => flight._id == updatedFlight._id);
-          if(collapsedFlight){
-            updatedFlight.isExpanded = collapsedFlight.isExpanded;
-          }
-        }
-      });
-
-      const checkedFlights = this.getCheckedFlights();
-
-      newFlights.forEach(flight => {
-        flight.isChecked = checkedFlights.checkedIsApproved.includes(flight._id!);
-
-        if (flight.isForwardChanged === true) {
-          flight.isChecked = checkedFlights.checkedLBZForwardChange.includes(flight._id!);
-        }
-
-        if (flight.isReturnChanged === true) {
-          flight.isChecked = checkedFlights.checkedLBZBackChange.includes(flight._id!);
-        }
-
-        if (flight.isChecked !== true || flight.isExpanded === true) {
-          flight.isExpanded = true;
-        }
+        this.updateCompletedFlights(flight);
+        this.updateEmergencyStopFlights(flight);
+        this.setIsExpanded(flight, nonCollapsedFlights, collapsedFlights, checkedFlights);
+        this.setIsChecked(flight, checkedFlights);
       });
 
       const filteredChecks: CheckedFlights = {
         checkedIsApproved: checkedFlights.checkedIsApproved.filter(id => newFlights.some(x => x._id == id)),
         checkedLBZBackChange: checkedFlights.checkedLBZBackChange.filter(id => newFlights.some(x => x._id == id)),
-        checkedLBZForwardChange: checkedFlights.checkedLBZForwardChange.filter(id => newFlights.some(x => x._id == id))
+        checkedLBZForwardChange: checkedFlights.checkedLBZForwardChange.filter(id => newFlights.some(x => x._id == id)),
+        expanded: checkedFlights.expanded.filter(id => newFlights.some(x => x._id == id)),
       };
 
       this.saveCheckedFlights(filteredChecks);
@@ -220,15 +203,89 @@ export class BrigadeComponent implements OnInit, OnDestroy {
 
 
     } catch (error) {
+      console.log(error)
       if (error instanceof HttpErrorResponse) {
       } else {
         this.toastsService.showError("Сталась помилка. Оновіть сторінку і спробуйте знову.");
       }
 
-      this.gotError$.next();
-      this.gotError$.complete();
+      // this.gotError$.next();
+      // this.gotError$.complete();
     }
   }
+
+  private updateCompletedFlights(flight : CheckedFlight){
+    this.calculateTimePassed(flight);
+
+    if (flight.flightStep.step == FlightSteps.END) {
+      flight.flightStep.visibleStep = FlightSteps.END;
+      flight.assignment!.color = 'gray';
+      if (!this.endOptions.includes(flight.boardingStatus ?? '')) {
+        flight.boardingStatus = 'Інше';
+      }
+    }
+  }
+
+  private updateEmergencyStopFlights(flight: CheckedFlight){
+    if (flight.isEmergencyStopByAdmin == true) {
+      flight.flightStep.visibleStep = FlightSteps.END
+      flight.assignment!.color = 'darkgray';
+      if (!this.endOptions.includes(flight.boardingStatus ?? '')) {
+        flight.boardingStatus = 'Екстренно заверешено';
+      }
+    }
+  }
+
+  private setIsExpanded(flightToUpdate: CheckedFlight
+    ,nonCollapsedFlights: CheckedFlight[]
+    ,collapsedFlights: CheckedFlight[]
+    ,checkedFlights: CheckedFlights){
+    const nonCollapsedFlight = nonCollapsedFlights.find(flight => flight._id === flightToUpdate._id);
+
+    if (nonCollapsedFlight) {
+      flightToUpdate.isExpanded = true;
+      this.addExpandedFlightToInMemoryCache(flightToUpdate, checkedFlights);
+    }else{
+      const collapsedFlight = collapsedFlights.find(flight => flight._id == flightToUpdate._id);
+      if(collapsedFlight){
+        flightToUpdate.isExpanded = collapsedFlight.isExpanded;
+        this.addExpandedFlightToInMemoryCache(flightToUpdate, checkedFlights);
+      }
+    }
+
+    //console.log(flightToUpdate)
+  }
+
+  private addExpandedFlightToInMemoryCache(flight: CheckedFlight, checkedFlights: CheckedFlights){
+    if(flight.isExpanded === true && !checkedFlights.expanded.some(x => x == flight._id!)){
+      checkedFlights.expanded.push(flight._id!);
+    }
+
+    if(flight.isExpanded === false && checkedFlights.expanded.some(x => x == flight._id!)){
+      const temp = checkedFlights.expanded.filter(x => x != flight._id!)
+      checkedFlights.expanded = [];
+      checkedFlights.expanded = [...temp];
+    }
+  }
+
+  private setIsChecked(flight: CheckedFlight, checkedFlights: CheckedFlights){
+    flight.isChecked = checkedFlights.checkedIsApproved.includes(flight._id!);
+
+    if (flight.isForwardChanged === true) {
+      flight.isChecked = checkedFlights.checkedLBZForwardChange.includes(flight._id!);
+    }
+
+    if (flight.isReturnChanged === true) {
+      flight.isChecked = checkedFlights.checkedLBZBackChange.includes(flight._id!);
+    }
+
+    if (flight.isChecked !== true || flight.isExpanded === true) {
+      flight.isExpanded = true;
+      this.addExpandedFlightToInMemoryCache(flight, checkedFlights);
+    }
+  }
+
+
 
   public getCheckedFlights(): CheckedFlights {
     const item = localStorage.getItem(this.CHECKED_FLIGHTS_KEY);
@@ -236,12 +293,16 @@ export class BrigadeComponent implements OnInit, OnDestroy {
     const empty = {
       checkedIsApproved: [],
       checkedLBZBackChange: [],
-      checkedLBZForwardChange: []
+      checkedLBZForwardChange: [],
+      expanded: []
     }
 
     if (item != null) {
       const parsed: CheckedFlights = JSON.parse(item);
-      return (parsed.checkedIsApproved && parsed.checkedLBZBackChange && parsed.checkedLBZForwardChange) ? parsed : empty;
+      return (parsed.checkedIsApproved 
+        && parsed.checkedLBZBackChange 
+        && parsed.checkedLBZForwardChange
+        && parsed.expanded) ? parsed : empty;
     }
 
     return empty;

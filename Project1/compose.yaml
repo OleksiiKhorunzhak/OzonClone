@@ -1,0 +1,21 @@
+services:
+  ozone:
+    image: ozone:latest
+    ports:
+      - "8085:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__Microsoft=Information
+
+  mongo:
+    image: mongo:8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ozone
+      - MONGO_INITDB_ROOT_PASSWORD=ozone
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

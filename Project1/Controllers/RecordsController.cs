@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
 using MongoDB.Driver.Linq;
+using Project1;
 using System.Globalization;
 
 namespace litak_back_end.Controllers
@@ -12,14 +13,22 @@ namespace litak_back_end.Controllers
     [ApiController]
     public class RecordsController : ControllerBase
     {
+        private readonly string _databaseName;
+        private readonly IMongoClient mongoClient;
+
+        public RecordsController(IConfiguration configuration, IMongoClient mongoClient)
+        {
+            _databaseName = configuration["ConnectionStrings:DatabaseName"];
+            this.mongoClient = mongoClient;
+        }
+
         [HttpGet]
         //[Authorize(AuthenticationSchemes = "BasicAuthentication")]
-        public async Task<List<object>> GetAllRecords()
+        public async Task<IActionResult> GetAllRecords()
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var records = (await recordsCollection.FindAsync(_ => true)).ToList();
 
             var convertedRecords = records.ConvertAll(record =>
@@ -31,7 +40,7 @@ namespace litak_back_end.Controllers
                 return record;
             });
 
-            return convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            return Ok(convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue));
         }
 
         [HttpPost]
@@ -40,26 +49,25 @@ namespace litak_back_end.Controllers
             try
             {
                 var record = BsonDocument.Parse(recordJson.ToString());
-                var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-                var database = mongoClient.GetDatabase("sample_weatherdata");
+                var database = mongoClient.GetDatabase(_databaseName);
 
-                var recordsCollection = database.GetCollection<BsonDocument>("records");
-                var filter1 = Builders<BsonDocument>.Filter.Eq("userId", record["userId"]);
-                var filter2 = Builders<BsonDocument>.Filter.Ne("flightStep.step", 6);
+                var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
+                var filter1 = Builders<BsonDocument>.Filter.Eq("userId", record["userId"].ToString());
+                var filter2 = Builders<BsonDocument>.Filter.Ne("flightStep.step", new BsonInt32(6));
                 var combinedFilter = Builders<BsonDocument>.Filter.And(filter1, filter2);
 
                 var previousRecord = (await recordsCollection.FindAsync(combinedFilter)).FirstOrDefault();
 
                 if (previousRecord is not null)
                 {
-                    await recordsCollection.ReplaceOneAsync(combinedFilter, record);
+                    return BadRequest("Previous record found");
                 }
                 else
                 {
                     await recordsCollection.InsertOneAsync(record);
                 }
 
-                return Ok("Record saved successfully");
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -68,7 +76,7 @@ namespace litak_back_end.Controllers
         }
 
         [HttpPut]
-        public async Task UpdateRecord(string recordId, [FromBody] JsonObject recordJson)
+        public async Task<IActionResult> UpdateRecord(string recordId, [FromBody] JsonObject recordJson)
         {
             var document = BsonDocument.Parse(recordJson.ToString());
 
@@ -83,48 +91,60 @@ namespace litak_back_end.Controllers
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(recordId));
 
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
-            var collection = database.GetCollection<BsonDocument>("records");
+            var database = mongoClient.GetDatabase(_databaseName);
+            var collection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
 
-            var existingDocument = await collection.Find(filter).FirstOrDefaultAsync();
+            var existingDocument = (await collection.FindAsync(filter)).FirstOrDefault();
+
+            if (existingDocument is null)
+            {
+                return NotFound();
+            }
+
+            if (existingDocument.Contains("isEmergencyStopByAdmin") && existingDocument["isEmergencyStopByAdmin"].AsBoolean == true)
+            {
+                return BadRequest(existingDocument["emergencyStopReason"].AsString);
+            }
 
             UpdateCheckedInformationIfNotExists(existingDocument, document);
             await collection.ReplaceOneAsync(filter, document);
+
+            return Ok();
         }
 
         [HttpDelete]
-        public async Task DeleteRecord(string recordId)
+        public async Task<IActionResult> DeleteRecord(string recordId)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(recordId));
             await recordsCollection.DeleteOneAsync(filter);
+
+            return Ok();
         }
 
         [HttpPost]
         [Route("delete-record-list")]
-        public async Task DeleteRecords([FromBody] List<string> recordIds)
+        public async Task<IActionResult> DeleteRecords([FromBody] List<string> recordIds)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
 
             var filter = Builders<BsonDocument>.Filter.In("_id", recordIds.Select(id => new ObjectId(id)));
 
             await recordsCollection.DeleteManyAsync(filter);
+
+            return Ok();
         }
 
         [HttpGet("GetNotFinishedRecords")]
-        public async Task<List<object>> GetNotFinishedRecords()
+        public async Task<IActionResult> GetNotFinishedRecords()
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var filter = Builders<BsonDocument>.Filter.Ne("flightStep.step", 6);
 
             var records = (await recordsCollection.FindAsync(filter)).ToList();
@@ -137,16 +157,15 @@ namespace litak_back_end.Controllers
                 return record;
             });
 
-            return convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            return Ok(convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue));
         }
 
         [HttpGet("GetNotFinishedRecordsOrItTenMinutesRange")]
-        public async Task<List<object>> GetNotFinishedRecordsOrItTenMinutesRange([FromQuery] int timeRange)
+        public async Task<IActionResult> GetNotFinishedRecordsOrItTenMinutesRange([FromQuery] int timeRange)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
 
 
             var currentTimeUtc = DateTime.UtcNow; // Current UTC time
@@ -166,16 +185,15 @@ namespace litak_back_end.Controllers
                 return record;
             });
 
-            return convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            return Ok(convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue));
         }
 
         [HttpGet("GetRecordsForUser")]
-        public async Task<List<object>> GetRecordsForUser([FromQuery] string userId)
+        public async Task<IActionResult> GetRecordsForUser([FromQuery] string userId)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var filter1 = Builders<BsonDocument>.Filter.Eq("userId", userId);
             var filter2 = Builders<BsonDocument>.Filter.Ne("flightStep.step", 6);
             var combinedFilter = Builders<BsonDocument>.Filter.And(filter1, filter2);
@@ -190,16 +208,15 @@ namespace litak_back_end.Controllers
                 return record;
             });
 
-            return convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            return Ok(convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue));
         }
 
         [HttpGet("GetRecordById")]
-        public async Task<List<object>> GetRecordById([FromQuery] string recordId)
+        public async Task<IActionResult> GetRecordById([FromQuery] string recordId)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", new ObjectId(recordId));
 
             var records = (await recordsCollection.FindAsync(filter)).ToList();
@@ -212,27 +229,26 @@ namespace litak_back_end.Controllers
                 return record;
             });
 
-            return convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            return Ok(convertedRecords.ConvertAll(BsonTypeMapper.MapToDotNetValue));
         }
 
         [HttpGet("GetLastRecordByUserId")]
-        public async Task<object> GetLastRecordByUserId([FromQuery] string userId)
+        public async Task<IActionResult> GetLastRecordByUserId([FromQuery] string userId)
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
 
             var filter = Builders<BsonDocument>.Filter.Eq("userId", userId);
             var sort = Builders<BsonDocument>.Sort.Descending("dateOfFlight");
             var result = await recordsCollection.Find(filter).Sort(sort).Limit(1).FirstOrDefaultAsync();
 
             if(result is null){
-                return null;
+                return NotFound();
             }
 
             result["_id"] = result["_id"].AsObjectId.ToString();
-            return BsonTypeMapper.MapToDotNetValue(result);
+            return Ok(BsonTypeMapper.MapToDotNetValue(result));
         }
 
         private static void UpdateCheckedInformationIfNotExists(BsonDocument? existingDocument, BsonDocument document)
@@ -249,7 +265,7 @@ namespace litak_back_end.Controllers
 
             if (isFlightStepCheckedElement.Name is not null)
             {
-                if (!document.Contains(isFlightStepCheckedElement))
+                if (!document.Contains(isFlightStepCheckedElement.Name))
                 {
                     document.Add(isFlightStepCheckedElement);
                 }
@@ -257,7 +273,7 @@ namespace litak_back_end.Controllers
 
             if (isLbzForwardStepCheckedElement.Name is not null)
             {
-                if (!document.Contains(isLbzForwardStepCheckedElement))
+                if (!document.Contains(isLbzForwardStepCheckedElement.Name))
                 {
                     document.Add(isLbzForwardStepCheckedElement);
                 }
@@ -265,7 +281,7 @@ namespace litak_back_end.Controllers
 
             if (isLbzBackStepCheckedElement.Name is not null)
             {
-                if (!document.Contains(isLbzBackStepCheckedElement))
+                if (!document.Contains(isLbzBackStepCheckedElement.Name))
                 {
                     document.Add(isLbzBackStepCheckedElement);
                 }
@@ -273,7 +289,7 @@ namespace litak_back_end.Controllers
 
             if (isReductionStepCheckedElement.Name is not null)
             {
-                if (!document.Contains(isReductionStepCheckedElement))
+                if (!document.Contains(isReductionStepCheckedElement.Name))
                 {
                     document.Add(isReductionStepCheckedElement);
                 }

@@ -31,6 +31,7 @@ export class PilotStartComponent implements OnInit {
 
   flight: Flight = {
     isRequireAttention: false,
+    isEmergencyStopByAdmin: false,
     flightStep: {
       step: FlightSteps.START,
       visibleStep: FlightSteps.START,
@@ -87,6 +88,8 @@ export class PilotStartComponent implements OnInit {
           this.flight.assignment = this.options.dronAppointment?.find(x => x.name.toUpperCase() == ui.userOptions?.dronAppointment?.toUpperCase());
           this.flight.model = this.options.dronModels?.find(x => x.name.toUpperCase() == ui.userOptions?.dronModel?.toUpperCase());
           this.flight.isRequireAttention = false;
+          this.flight.userId = this.userInfo._id;
+          this.flight.zone =  ui.userOptions?.zone;
         }
       }
     })
@@ -116,6 +119,7 @@ export class PilotStartComponent implements OnInit {
           this.isLoading = false;
         }
       }
+      this.toastService.showError("Сталась помилка. Оновіть сторінку і спробуйте знову.");
       this.isLoading = false;
     }
 
@@ -125,7 +129,11 @@ export class PilotStartComponent implements OnInit {
 
 
   public async getLastFlight(){
-    this.flight.userId = this.userInfo._id;
+    const ui = this.userService.getUserInfo();
+    if(ui){
+      this.userInfo = ui;
+      this.flight.userId = ui._id;
+    }
 
     const flightRecord = await this.flightService.getLastFlightByUserId();
 
@@ -147,6 +155,7 @@ export class PilotStartComponent implements OnInit {
       this.flight.routeBack = flightRecord.routeBack;
       this.flight.workingHeight = flightRecord.workingHeight;
       this.flight.streamLink = flightRecord.streamLink;
+      this.flight.userId = this.userInfo._id;
     }
   }
 

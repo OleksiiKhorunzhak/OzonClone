@@ -1,15 +1,11 @@
-﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Project1;
 using Project1.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace litak_back_end.Controllers
 {
@@ -19,7 +15,7 @@ namespace litak_back_end.Controllers
     {
         private static List<string> _headers = new List<string>()
         {
-            "Місія",
+            "Позивний",
             "Створений",
             "Призначення",
             "Дрон",
@@ -44,8 +40,18 @@ namespace litak_back_end.Controllers
             "Скасованно пілотом",
             "Посадка",
             "Статус",
+            "Завершено черговим",
+            "Етап польоту під час завершення",
             "Закінчення",
         };
+
+        private readonly string _connectionString;
+        private readonly string _databaseName;
+        public RecordFileController(IConfiguration configuration)
+        {
+            _connectionString = configuration["ConnectionStrings:Server"];
+            _databaseName = configuration["ConnectionStrings:DatabaseName"];
+        }
 
         [HttpGet]
         public async Task<IActionResult> BuildFile()
@@ -57,10 +63,10 @@ namespace litak_back_end.Controllers
 
         private async Task<List<object>> GetAllRecords()
         {
-            var mongoClient = new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
-            var database = mongoClient.GetDatabase("sample_weatherdata");
+            var mongoClient = new MongoClient(_connectionString);
+            var database = mongoClient.GetDatabase(_databaseName);
 
-            var recordsCollection = database.GetCollection<BsonDocument>("records");
+            var recordsCollection = database.GetCollection<BsonDocument>(CollectionNames.RecordCollection);
             var records = (await recordsCollection.FindAsync(_ => true)).ToList();
 
             var convertedRecords = records.ConvertAll(record =>
@@ -122,8 +128,7 @@ namespace litak_back_end.Controllers
         private static void BuildRecordCell(Row rowData, IDictionary<string, object> record)
         {
             // Місія
-            rowData.Append(CreateCell($"{record.FormatDateTime("dateOfFlight", true)}-{record.GetValue("operator")}",
-                CellValues.String));
+            rowData.Append(CreateCell($"{record.GetValue("operator")}",CellValues.String));
 
             // Створений
             rowData.Append(CreateCell($"{record.FormatDateTime("dateOfFlight")}", CellValues.Date));
@@ -204,7 +209,13 @@ namespace litak_back_end.Controllers
             rowData.Append(CreateCell($"{record.GetValue("boardingStatus")}", CellValues.String));
 
             // Статус
-            rowData.Append(CreateCell($"{record.GetStatus()}", CellValues.String));
+            rowData.Append(CreateCell($"{record.GetStatus("step")}", CellValues.String));
+
+            // Завершено черговим
+            rowData.Append(CreateCell($"{record.GetValue("emergencyStopReason")}", CellValues.String));
+
+            // Етап польоту під час завершення
+            rowData.Append(CreateCell($"{record.GetStatus("stepBeforeEmergencyStop")}", CellValues.String));
 
             // Закінчення
             rowData.Append(CreateCell($"{record.FormatDateTime("endDate")}", CellValues.Date));

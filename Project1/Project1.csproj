@@ -8,6 +8,7 @@
     <SpaProxyServerUrl>http://localhost:44491</SpaProxyServerUrl>
     <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Configurationss>Debug;West;Release</Configurationss>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,4 +59,14 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+
+  <Choose>
+    <When Condition="'$(Configuration)' == 'West'">
+      <ItemGroup>
+        <Content Remove="appsettings.Test.json" />
+        <Content Remove="appsettings.Development.json" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
 </Project>

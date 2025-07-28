@@ -10,6 +10,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastsService } from 'src/app/services/toasts.service';
 import { PromptModalComponent } from '../../shared/prompt-modal/prompt-modal.component';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ConfirmModalComponent } from '../../shared/confirm-modal/confirm.component';
 
 @Component({
     selector: 'app-pilot-flight',
@@ -74,11 +75,20 @@ export class PilotFlightComponent implements OnInit {
             await this.flightService.updateFlightAsync(this.flight);
             await this.flightService.refreshActiveFlight();
           } catch (error) {
-            console.log(error)
             if (error instanceof HttpErrorResponse) {
               if (error.status == 200) {
                 await this.flightService.refreshActiveFlight();
-              } else {
+              } 
+              else if (error.status == 400) {
+                const confirmModal = this.modalService.open(ConfirmModalComponent);
+                confirmModal.componentInstance.title = 'Політ відмінено';
+                confirmModal.componentInstance.text = error.error;
+                confirmModal.componentInstance.yes = 'Зрозуміло';
+                await confirmModal.closed.toPromise();
+
+                await this.flightService.refreshActiveFlight();
+              }
+              else {
                 this.flight._id = this.flightId;
                 this.flight.flightStartDate = undefined;
                 this.flight.flightStep.step = FlightSteps.START;

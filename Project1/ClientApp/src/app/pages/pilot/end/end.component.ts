@@ -25,6 +25,7 @@ export class PilotEndComponent implements OnInit, OnDestroy {
 
   constructor(
     private flightService: FlightService,
+    private toastsService: ToastsService,
     private modalService: NgbModal) { }
 
   ngOnDestroy(): void {
@@ -69,6 +70,7 @@ export class PilotEndComponent implements OnInit, OnDestroy {
           await this.flightService.updateFlightAsync(this.flight);
           await this.flightService.refreshActiveFlight();
         } catch (error) {
+          this.toastsService.showError("Сталась помилка. Оновіть сторінку і спробуйте знову.");
           if (error instanceof HttpErrorResponse)
             if (error.status == 200) {
               await this.flightService.refreshActiveFlight();

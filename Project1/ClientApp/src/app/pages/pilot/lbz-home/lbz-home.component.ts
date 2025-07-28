@@ -7,6 +7,7 @@ import { YesNoModalComponent } from '../../shared/yes-no-modal/yes-no-modal.comp
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastsService } from 'src/app/services/toasts.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ConfirmModalComponent } from '../../shared/confirm-modal/confirm.component';
 
 @Component({
   selector: 'app-pilot-lbz-home',
@@ -82,7 +83,17 @@ export class PilotLbzHomeComponent implements OnInit, OnDestroy {
       if(error instanceof HttpErrorResponse)
         if (error.status == 200) {
           await this.flightService.refreshActiveFlight();
-        } else {
+        } 
+        else if (error.status == 400) {
+          const confirmModal = this.modalService.open(ConfirmModalComponent);
+          confirmModal.componentInstance.title = 'Політ відмінено';
+          confirmModal.componentInstance.text = error.error;
+          confirmModal.componentInstance.yes = 'Зрозуміло';
+          await confirmModal.closed.toPromise();
+
+          await this.flightService.refreshActiveFlight();
+        }
+        else {
           this.flight.flightStep.step = FlightSteps.RETURN;
           this.flight.flightStep.isApproved = true;
           this.flight._id = this.flightId;

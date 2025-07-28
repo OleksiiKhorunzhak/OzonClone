@@ -19,6 +19,7 @@ export class PersonalInfoComponent implements OnInit {
       dronModel: '',
       dronAppointment: '',
       unit: '',
+      zone: '',
       templates: []
     }
   };
@@ -40,7 +41,7 @@ export class PersonalInfoComponent implements OnInit {
   async saveChanges() {
 
     await this.userService.updateUser(this.userInfo);
-
+    this.toastService.showSuccess('Налаштування було збережено.');
     var ui = this.userService.getUserInfo();
 
     if (ui) {

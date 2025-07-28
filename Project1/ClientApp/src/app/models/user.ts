@@ -24,6 +24,7 @@ export interface User {
         dronAppointment?: string;
         dronType?: string;
         unit?: string;
+        zone?: string;
         templates?: Template[];
     }
 };

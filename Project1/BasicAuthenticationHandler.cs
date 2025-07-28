@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -54,7 +54,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     private static async Task<bool> IsAuthenticated(string username, string password)
     {
         var mongoClient =
-            new MongoClient("mongodb+srv://admin:admin@sandbox.ioqzb.mongodb.net/");
+            new MongoClient("mongodb+srv://western-ozon-db:onTRaHx6EV8SgKdB@cluster0.jfg3y84.mongodb.net/");
         var database = mongoClient.GetDatabase("sample_weatherdata");
         var filter = new BsonDocument(){ {"login", username}, {"password", password}};
         

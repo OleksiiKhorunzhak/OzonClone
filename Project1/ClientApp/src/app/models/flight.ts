@@ -12,12 +12,12 @@ export enum FlightSteps {
 
 export interface FlightStep {
     step?: number;
+    visibleStep?: number;
+    stepBeforeEmergencyStop?: number;
     isApproved?: boolean;
     isApprovedByAdmin?: boolean;
     isApprovedByPPO?: boolean;
     isApprovedByREB?: boolean;
-
-    visibleStep?:number;
 }
 
 export interface Flight {
@@ -77,6 +77,8 @@ export interface Flight {
     isRejectedbyPPO?: boolean;
     isRejectedbyREB?: boolean;
     isRejectedbyAdmin?: boolean;
+    isEmergencyStopByAdmin?: boolean;
+    emergencyStopReason?: string;
 
     isTerminated?: boolean;
     terminatedPilotReason?: string;
