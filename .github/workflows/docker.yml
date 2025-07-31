@@ -1,0 +1,53 @@
+name: Build and Publish ozone Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata for server Docker image
+      id: meta-server
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/ozone
+        tags: |
+          type=raw,value=${{ github.run_number }}
+          type=raw,value=latest
+
+    - name: Build and push server Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./Project1
+        file: ./Project1/Dockerfile
+        push: true
+        tags: ${{ steps.meta-server.outputs.tags }}
+
+    - name: Logout from GitHub Container Registry
+      run: docker logout ghcr.io
