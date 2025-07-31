@@ -1,0 +1,33 @@
+{
+    // See https://code.visualstudio.com/docs/editor/tasks for more information
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Docker Compose Up",
+            "type": "docker-compose",
+            "dockerCompose": {
+                "up": {
+                    "detached": true,
+                    "build": true,
+                },
+                "files": [
+                    "${workspaceFolder}/Project1/compose.yaml",
+                    "${workspaceFolder}/Project1/compose.override.yaml"
+                ],
+                
+            }
+        },
+        {
+            "label": "Docker Compose Down",
+            "type": "docker-compose",
+            "dockerCompose": {
+                "down": {},
+                "files": [
+                    "${workspaceFolder}/Project1/compose.yaml",
+                    "${workspaceFolder}/Project1/compose.override.yaml"
+                ]
+            },
+            "problemMatcher": []
+        }
+    ]
+}

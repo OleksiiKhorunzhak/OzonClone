@@ -1,0 +1,10 @@
+services:
+  ozone:
+    build:
+      context: .
+    ports:
+      - "8085:80"
+
+  mongo:
+    ports:
+      - "27017:27017"

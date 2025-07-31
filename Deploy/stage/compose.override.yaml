@@ -1,0 +1,5 @@
+services:
+  ozone:
+    image: ghcr.io/oleksiikhorunzhak/ozone:1
+    ports:
+      - "127.0.0.1:11080:80"

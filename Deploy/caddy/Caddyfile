@@ -1,0 +1,11 @@
+{
+  metrics {
+    per_host
+  }
+}
+
+# west
+west.ozone.vepr.net.ua {
+  log
+  reverse_proxy localhost:10080
+}
